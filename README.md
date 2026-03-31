@@ -56,6 +56,7 @@ claude-code-setup/
 | Folder | Trigger | Description |
 |--------|---------|-------------|
 | [skills/create-merge-request/](./skills/create-merge-request/SKILL.md) | `/create-merge-request` | Creates a GitLab MR using `glab` CLI with the Familiprix French template |
+| [skills/humanizer/](./skills/humanizer/SKILL.md) | `/humanizer` | Removes AI writing patterns from text — fixes inflated language, em dashes, sycophancy, filler, and adds human voice |
 | [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | French plan document — Problématique / Solution / Caveat (skill version) |
 | [skills/react-doctor/](./skills/react-doctor/SKILL.md) | `/react-doctor` | Runs `npx react-doctor` to scan React code and output a quality score |
 
