@@ -2,7 +2,9 @@
 name: cypress-test
 description: Expert Cypress test engineer. Generates comprehensive E2E tests for components and features. Proactively adds tests when code changes are detected.
 tools: Read, Glob, Write, Edit, Bash, Grep
-model: inherit
+model: sonnet
+effort: medium
+color: green
 ---
 
 # Cypress Test Agent

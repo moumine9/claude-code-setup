@@ -2,6 +2,13 @@
 name: react-doctor
 description: Run after making React changes to catch issues early. Use when reviewing code, finishing a feature, or fixing bugs in a React project.
 version: 1.0.0
+user-invocable: true
+allowed-tools:
+  - Bash(npx -y react-doctor@latest:*)
+  - Read
+  - Glob
+model: haiku
+effort: low
 ---
 
 # React Doctor

@@ -15,7 +15,7 @@ claude-code-setup/
 ├── commands/                   → User-level slash commands → ~/.claude/commands/
 ├── config/
 │   └── settings-template.json  → Template for ~/.claude/settings.json
-├── hooks/                      → PreToolUse hook scripts → ~/.claude/hooks/
+├── hooks/                      → Hook scripts → ~/.claude/hooks/
 ├── skills/                     → Installable skills → ~/.claude/skills/<name>/SKILL.md
 └── README.md
 ```
@@ -27,11 +27,28 @@ claude-code-setup/
 > Custom subagents — specialized AI assistants with their own context window, tools, and system prompts.
 > Install to: `~/.claude/agents/`
 
-| File | Name | Description |
-|------|------|-------------|
-| [agents/code-review-frontend.md](./agents/code-review-frontend.md) | code-reviewer | Frontend code review for quality, security, and maintainability |
-| [agents/lint.md](./agents/lint.md) | lint | Runs `yarn lint` + prettier, fixes issues per eslint/prettier config |
-| [agents/cypress-test.md](./agents/cypress-test.md) | cypress-test | Generates comprehensive Cypress E2E tests, runs them to verify |
+| File | Name | Color | Model | Description |
+|------|------|-------|-------|-------------|
+| [agents/code-review-frontend.md](./agents/code-review-frontend.md) | code-reviewer | blue | sonnet | Frontend code review for quality, security, and maintainability |
+| [agents/lint.md](./agents/lint.md) | lint | yellow | haiku | Runs `yarn lint --fix` + prettier, fixes issues per eslint/prettier config |
+| [agents/cypress-test.md](./agents/cypress-test.md) | cypress-test | green | sonnet | Generates comprehensive Cypress E2E tests, runs them to verify |
+
+### Agent frontmatter reference
+
+Fields used in this repo (from [source code analysis](https://buildingbetter.tech/p/i-read-the-claude-code-source-code)):
+
+| Field | Purpose |
+|-------|---------|
+| `name` | Agent identifier |
+| `description` | What the agent does — used by Claude to decide when to invoke |
+| `tools` | Comma-separated list of allowed tools |
+| `model` | `haiku`, `sonnet`, or `opus` — overrides the calling model |
+| `effort` | `low`, `medium`, `high`, `max` — controls reasoning depth |
+| `color` | `red\|orange\|yellow\|green\|blue\|purple\|pink\|gray` — UI color coding |
+| `memory` | `user\|project\|local` — persistent memory across invocations |
+| `context` | `fork` — run as background forked subagent |
+| `omitClaudeMd` | `true` — skip project instruction hierarchy |
+| `requiredMcpServers` | MCP server patterns that must be configured |
 
 ---
 
@@ -43,8 +60,8 @@ claude-code-setup/
 | File | Trigger | Description |
 |------|---------|-------------|
 | [commands/commit.md](./commands/commit.md) | `/commit` | Conventional Commits 1.0.0 compliant commit — stages files and commits |
-| [commands/list-tasks-frontend.md](./commands/list-tasks-frontend.md) | `/list-tasks-frontend` | Generates French summary of frontend work (Fonctionnalités / Correctifs / Optimisations) |
-| [commands/plan-realisation-fe.md](./commands/plan-realisation-fe.md) | `/plan-realisation-fe` | Generates French plan document (Problématique / Solution / Caveat) |
+| [commands/list-tasks-frontend.md](./commands/list-tasks-frontend.md) | `/list-tasks-frontend` | Generates French summary of frontend work (Fonctionnalites / Correctifs / Optimisations) |
+| [commands/plan-realisation-fe.md](./commands/plan-realisation-fe.md) | `/plan-realisation-fe` | Generates French plan document (Problematique / Solution / Caveat) |
 | [.claude/commands/cypress-test.md](./.claude/commands/cypress-test.md) | `/cypress-test` | Adds meaningful Cypress E2E tests for modified files (project-scoped) |
 
 ---
@@ -53,12 +70,30 @@ claude-code-setup/
 
 > Installable skills. Install to `~/.claude/skills/<skill-name>/SKILL.md`.
 
-| Folder | Trigger | Description |
-|--------|---------|-------------|
-| [skills/create-merge-request/](./skills/create-merge-request/SKILL.md) | `/create-merge-request` | Creates a GitLab MR using `glab` CLI with the Familiprix French template |
-| [skills/humanizer/](./skills/humanizer/SKILL.md) | `/humanizer` | Removes AI writing patterns from text — fixes inflated language, em dashes, sycophancy, filler, and adds human voice |
-| [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | French plan document — Problématique / Solution / Caveat (skill version) |
-| [skills/react-doctor/](./skills/react-doctor/SKILL.md) | `/react-doctor` | Runs `npx react-doctor` to scan React code and output a quality score |
+| Folder | Trigger | Model | Description |
+|--------|---------|-------|-------------|
+| [skills/create-merge-request/](./skills/create-merge-request/SKILL.md) | `/create-merge-request` | inherit | Creates a GitLab MR using `glab` CLI with the Familiprix French template |
+| [skills/humanizer/](./skills/humanizer/SKILL.md) | `/humanizer` | inherit | Removes AI writing patterns from text — fixes inflated language, em dashes, sycophancy, filler, and adds human voice |
+| [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | inherit | French plan document — Problematique / Solution / Caveat (skill version) |
+| [skills/react-doctor/](./skills/react-doctor/SKILL.md) | `/react-doctor` | haiku | Runs `npx react-doctor` to scan React code and output a quality score |
+
+### Skill frontmatter reference
+
+| Field | Purpose |
+|-------|---------|
+| `name` | Skill identifier |
+| `description` | What the skill does — used for auto-invocation matching |
+| `user-invocable` | `true` — allows manual `/skill-name` invocation |
+| `disable-model-invocation` | `true` — prevents auto-invocation, requires explicit `/skill-name` |
+| `allowed-tools` | List of tools the skill can use |
+| `model` | `haiku\|sonnet\|opus` — override which model runs the skill |
+| `effort` | `low\|medium\|high\|max` — control reasoning depth |
+| `argument-hint` | Placeholder shown in autocomplete (e.g. `"[target-branch]"`) |
+| `hooks` | Define hooks active only during skill execution |
+| `agent` | Delegate skill to a custom agent |
+| `shell` | `bash` — specify execution shell |
+
+> **Cache tip:** Using different `model` values on forked skills breaks prompt cache. Omit the field or use `model: inherit` when cache efficiency matters.
 
 ---
 
@@ -113,7 +148,34 @@ Then re-authenticate via `/mcp` in a Claude Code session.
 ## Hooks
 
 Hooks live in `D:/claude-code-setup/hooks/` and are wired into `~/.claude/settings.json`.
-`~/.claude/hooks/protect-sensitive-files.sh` is a thin forwarder that calls the D:/ source file so updates are automatic.
+`~/.claude/hooks/` scripts are thin forwarders that call the D:/ source files so updates are automatic.
+
+### Hook system reference
+
+Hook types available in Claude Code:
+
+| Hook Type | When it fires | Key return fields |
+|-----------|--------------|-------------------|
+| `SessionStart` | Session begins | `watchPaths`, `initialUserMessage`, `additionalContext` |
+| `PreToolUse` | Before a tool runs | `updatedInput`, `permissionDecision`, `permissionDecisionReason`, `additionalContext` |
+| `PostToolUse` | After a tool runs | `updatedMCPToolOutput`, `additionalContext` |
+| `PermissionRequest` | Permission prompt | `decision`, `updatedInput`, `updatedPermissions` |
+
+Undocumented hook fields:
+
+| Field | Effect |
+|-------|--------|
+| `once: true` | Fire exactly once, then auto-remove |
+| `async: true` | Run in background without blocking |
+| `asyncRewake: true` | Non-blocking normally, blocks if exit code 2 |
+
+### session-context.sh (NEW)
+
+**Trigger:** `SessionStart`
+
+**What it does:**
+- Injects current git branch, uncommitted changes count, and recent commits as `additionalContext`
+- Returns `watchPaths` for config files (`package.json`, `tsconfig.json`, `.eslintrc.*`, etc.) so Claude gets `FileChanged` events when they're modified
 
 ### protect-sensitive-files.sh
 
@@ -135,39 +197,36 @@ Hooks live in `D:/claude-code-setup/hooks/` and are wired into `~/.claude/settin
 { "permissions": { "allow": ["Read(./.env.local)"] } }
 ```
 
+### dry-run-guard.sh (NEW)
+
+**Trigger:** `PreToolUse` on `Bash`
+
+**What it does:**
+- Intercepts destructive git commands (`git push --force`, `git reset --hard`, `git clean -f`)
+- For `git push`: rewrites the command to add `--dry-run` via `updatedInput`, so Claude sees what would happen first
+- For `reset --hard` / `clean -f`: injects `additionalContext` telling Claude to ask the user before proceeding
+- Non-destructive commands pass through unchanged
+
 ### Setup on a new machine
 
 ```bash
 mkdir -p ~/.claude/hooks
 
-# Option A — forwarder (keeps D:/claude-code-setup as source of truth)
-cat > ~/.claude/hooks/protect-sensitive-files.sh << 'EOF'
+# Option A — forwarders (keeps D:/claude-code-setup as source of truth)
+for hook in protect-sensitive-files.sh session-context.sh dry-run-guard.sh; do
+  cat > ~/.claude/hooks/$hook << EOF
 #!/usr/bin/env bash
-exec /d/claude-code-setup/hooks/protect-sensitive-files.sh
+exec /d/claude-code-setup/hooks/$hook
 EOF
-chmod +x ~/.claude/hooks/protect-sensitive-files.sh
+  chmod +x ~/.claude/hooks/$hook
+done
 
-# Option B — standalone copy (no D: dependency)
-cp D:/claude-code-setup/hooks/protect-sensitive-files.sh ~/.claude/hooks/
-chmod +x ~/.claude/hooks/protect-sensitive-files.sh
+# Option B — standalone copies (no D: dependency)
+cp D:/claude-code-setup/hooks/*.sh ~/.claude/hooks/
+chmod +x ~/.claude/hooks/*.sh
 ```
 
-Then add to `~/.claude/settings.json`:
-```json
-"hooks": {
-  "PreToolUse": [
-    {
-      "matcher": "Read|Edit|Write",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/protect-sensitive-files.sh\""
-        }
-      ]
-    }
-  ]
-}
-```
+Then merge the hooks section from `config/settings-template.json` into `~/.claude/settings.json`.
 
 ---
 
@@ -177,24 +236,51 @@ Then add to `~/.claude/settings.json`:
 
 See [config/settings-template.json](./config/settings-template.json) for a reference template.
 
-### Manual configuration steps performed on this machine
+### Key settings explained
 
-These are settings that must be set manually (not covered by file copies above):
+#### `permissions.allow` — auto-approved operations
+Patterns that Claude can execute without asking. Uses glob syntax:
+- `Bash(git checkout:*)` — any git checkout command
+- `Read(src/**)` — read anything under src/
+- `WebFetch(domain:usehooks-ts.com)` — fetch from specific domains
+- `mcp__slack__post_message` — specific MCP tool access
 
-#### 1. `statusLine` — claude-hud
+#### `permissions.soft_deny` — confirmation required
+Operations that require user confirmation before executing. Claude will ask before running these:
+- `Bash(git push --force:*)` — force pushes
+- `Bash(git reset --hard:*)` — hard resets
+- `Bash(rm -rf:*)` — recursive deletes
+- `Write(.env*)` — writing to env files
 
-Generated by running `/claude-hud:setup` after installing the plugin. The command is platform/runtime specific — re-run the skill on the new machine rather than copy-pasting this value.
+#### `permissions.environment` — classifier context
+Plain English descriptions that help Claude's auto-mode permission classifier make better decisions:
+```json
+"environment": [
+  "This is a frontend development environment using React, TypeScript, and Yarn",
+  "GitLab is used for version control — use glab CLI for MR operations",
+  "Sensitive files (.env, credentials, keys) must never be read or committed"
+]
+```
 
-#### 2. `alwaysThinkingEnabled` + `effortLevel`
+#### `autoMemoryEnabled` — learning loop
+When `true`, Claude automatically extracts durable memories from sessions. Combined with `autoDreamEnabled: true`, it runs background consolidation every 24 hours after 5+ sessions.
+
+#### `alwaysThinkingEnabled` + `effortLevel`
 
 ```json
 "alwaysThinkingEnabled": true,
 "effortLevel": "high"
 ```
 
-Set manually in `~/.claude/settings.json`. Enables extended thinking and sets effort to max on every request.
+Enables extended thinking and sets reasoning effort to high on every request.
 
-#### 3. Permissions allow-list
+### Manual configuration steps performed on this machine
+
+#### 1. `statusLine` — claude-hud
+
+Generated by running `/claude-hud:setup` after installing the plugin. The command is platform/runtime specific — re-run the skill on the new machine rather than copy-pasting this value.
+
+#### 2. Permissions allow-list
 
 Key entries added over time (in `~/.claude/settings.json`):
 ```json
@@ -210,7 +296,7 @@ Key entries added over time (in `~/.claude/settings.json`):
 }
 ```
 
-#### 4. `additionalDirectories`
+#### 3. `additionalDirectories`
 
 Points to any project-local skill directories you want Claude to load automatically:
 ```json
@@ -221,7 +307,7 @@ Points to any project-local skill directories you want Claude to load automatica
 
 Update to match the project path on the new machine.
 
-#### 5. Project-level settings (`<project>/.claude/settings.local.json`)
+#### 4. Project-level settings (`<project>/.claude/settings.local.json`)
 
 For projects using `glab` (GitLab), add these permissions:
 ```json
@@ -256,12 +342,12 @@ For projects using `glab` (GitLab), add these permissions:
 - [ ] Copy `agents/` → `~/.claude/agents/`
 - [ ] Copy `commands/` → `~/.claude/commands/`
 - [ ] Copy `skills/*/SKILL.md` → `~/.claude/skills/*/SKILL.md`
+- [ ] Copy `hooks/*.sh` → `~/.claude/hooks/` (or set up forwarders)
 - [ ] Merge `config/settings-template.json` into `~/.claude/settings.json`
 
 ### Manual setup
 - [ ] Install claude-hud plugin and run `/claude-hud:setup`
 - [ ] Set `alwaysThinkingEnabled: true` and `effortLevel: "high"` in `~/.claude/settings.json`
-- [ ] Set up protect-sensitive-files hook (see Hooks section above)
 - [ ] Add chrome-devtools MCP: `claude mcp add chrome-devtools -s user -- npx chrome-devtools-mcp@latest`
 - [ ] Add remote MCP servers (Gmail, Google Calendar) and authenticate via `/mcp`
 - [ ] Add project-level `settings.local.json` for any projects using `glab`
@@ -270,6 +356,7 @@ For projects using `glab` (GitLab), add these permissions:
 
 ## References
 
+- [Claude Code Source Analysis](https://buildingbetter.tech/p/i-read-the-claude-code-source-code) — undocumented features reference
 - [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 - [Claude Code Docs](https://docs.anthropic.com/en/docs/claude-code)
 - [claude-hud plugin](https://github.com/jarrodwatts/claude-hud)

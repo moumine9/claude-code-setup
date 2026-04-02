@@ -8,6 +8,7 @@ description: |
   inflated symbolism, promotional language, superficial -ing analyses, vague
   attributions, em dash overuse, rule of three, AI vocabulary words, negative
   parallelisms, and excessive conjunctive phrases.
+user-invocable: true
 allowed-tools:
   - Read
   - Write
