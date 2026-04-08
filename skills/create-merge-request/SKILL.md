@@ -70,8 +70,9 @@ _Notes additionnelles:_
 - All descriptive text MUST be in **French**.
 - Extract the ticket reference from the branch name (e.g. `PV2-15523-fix-2` → `PV2-15523`).
 - The description should explain the **why**, not just the what.
-- "Travail effectué" should be a bulleted list derived from the commits and diff.
+- "Travail effectué" should be a bulleted list derived from the commits and diff. Include always the fix, features created. In last include the improvments, code-refactoring.
 - "Résultat" should describe the user-facing or developer-facing outcome.
+- Use /humanizer skill to make sure that all generated text do not look like it's AI generated.
 - Do NOT include `/draft` — the MR should be created as ready.
 - Do NOT include `/assign_reviewer` — the user will add reviewers manually.
 
@@ -80,6 +81,7 @@ _Notes additionnelles:_
 - Format: `<TICKET-ID> - <short imperative description>`
 - Example: `PV2-15523 - Aligner la barre d'outils avec le DataGrid`
 - Keep under 72 characters.
+- Short imperative description should be in french.
 
 ### 6. Create the MR
 
