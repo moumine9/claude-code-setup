@@ -73,6 +73,7 @@ Fields used in this repo (from [source code analysis](https://buildingbetter.tec
 | Folder | Trigger | Model | Description |
 |--------|---------|-------|-------------|
 | [skills/create-merge-request/](./skills/create-merge-request/SKILL.md) | `/create-merge-request` | inherit | Creates a GitLab MR using `glab` CLI with the Familiprix French template |
+| [skills/update-merge-request/](./skills/update-merge-request/SKILL.md) | `/update-merge-request` | inherit | Syncs the "Travail effectué" section of the current branch's MR with its actual commits — only touches that section |
 | [skills/humanizer/](./skills/humanizer/SKILL.md) | `/humanizer` | inherit | Removes AI writing patterns from text — fixes inflated language, em dashes, sycophancy, filler, and adds human voice |
 | [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | inherit | French plan document — Problematique / Solution / Caveat (skill version) |
 | [skills/react-doctor/](./skills/react-doctor/SKILL.md) | `/react-doctor` | haiku | Runs `npx react-doctor` to scan React code and output a quality score |
