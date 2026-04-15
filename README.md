@@ -208,13 +208,23 @@ Undocumented hook fields:
 - For `reset --hard` / `clean -f`: injects `additionalContext` telling Claude to ask the user before proceeding
 - Non-destructive commands pass through unchanged
 
+### auto-update-mr-on-commit.sh
+
+**Trigger:** `PostToolUse` on `Bash`
+
+**What it does:**
+- Detects when a `git commit` was just executed
+- Checks if an open MR exists for the current branch via `glab mr view`
+- If yes, injects `additionalContext` prompting Claude to run `/update-merge-request` to sync the "Travail effectué" section
+- Fails silently (no output, exit 0) when not a commit, no repo, no open MR, or glab unavailable
+
 ### Setup on a new machine
 
 ```bash
 mkdir -p ~/.claude/hooks
 
 # Option A — forwarders (keeps D:/claude-code-setup as source of truth)
-for hook in protect-sensitive-files.sh session-context.sh dry-run-guard.sh; do
+for hook in protect-sensitive-files.sh session-context.sh dry-run-guard.sh auto-update-mr-on-commit.sh; do
   cat > ~/.claude/hooks/$hook << EOF
 #!/usr/bin/env bash
 exec /d/claude-code-setup/hooks/$hook
@@ -223,7 +233,7 @@ EOF
 done
 
 # Option B — standalone copies (no D: dependency)
-cp D:/claude-code-setup/hooks/*.sh ~/.claude/hooks/
+cp /d/claude-code-setup/hooks/*.sh ~/.claude/hooks/
 chmod +x ~/.claude/hooks/*.sh
 ```
 
