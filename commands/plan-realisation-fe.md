@@ -11,28 +11,28 @@ Tu dois analyser le contexte actuel (branche, commits, diff, code) **ainsi que l
 
 ### 1. Identifie le numéro de ticket Jira
 
-- Si un numero de ticket est fourni en argument (ex: `PV2-12345`), utilise-le.
-- Sinon, tente de le détecter depuis le nom de la branche courante (`git branch --show-current`). Le numéro de ticket correspond au prefixe de la branche (ex: `PV2-12493` dans `PV2-12493-fix-something`).
-- Si aucun ticket ne peut etre identifié, demande-le à l'utilisateur avant de continuer.
+- Si un numéro de ticket est fourni en argument (ex: `PV2-12345`), utilise-le.
+- Sinon, tente de le détecter depuis le nom de la branche courante (`git branch --show-current`). Le numéro de ticket correspond au préfixe de la branche (ex: `PV2-12493` dans `PV2-12493-fix-something`).
+- Si aucun ticket ne peut être identifié, demande-le à l'utilisateur avant de continuer.
 
-### 2. Recupère le contexte Jira du ticket
+### 2. Récupère le contexte Jira du ticket
 
-Éxecute la commande suivante pour obtenir les details du ticket :
+Exécute la commande suivante pour obtenir les détails du ticket :
 
 ```bash
 acli jira workitem view <KEY> --fields "key,issuetype,summary,status,assignee,description,acceptance-criteria,labels,priority"
 ```
 
-Si la commande échoue où que le ticket n'existe pas, continue sans le contexte Jira (note-le dans le document final).
+Si la commande échoue ou que le ticket n'existe pas, continue sans le contexte Jira (note-le dans le document final).
 
 ### 3. Identifie la branche parente Git
 
-Execute `git log --oneline origin/develop..HEAD` et `git log --oneline origin/develop2..HEAD`. Celle avec le moins de commits est la branche parente.
+Exécute `git log --oneline origin/develop..HEAD` et `git log --oneline origin/develop2..HEAD`. Celle avec le moins de commits est la branche parente.
 
 ### 4. Analyse le code
 
-- Recupère les commits avec `git log <base>..HEAD --oneline`.
-- Recupère le diff avec `git diff <base>...HEAD -- frontend/`.
+- Récupère les commits avec `git log <base>..HEAD --oneline`.
+- Récupère le diff avec `git diff <base>...HEAD -- frontend/`.
 - Lis les fichiers modifiés si nécessaire pour comprendre le contexte.
 
 ## Format de sortie
@@ -40,18 +40,18 @@ Execute `git log --oneline origin/develop..HEAD` et `git log --oneline origin/de
 Génère le document suivant en markdown (syntaxe markdown) et en **français** :
 
 ```
-## Problematique
+## Problématique
 
 Bref résumé du problème identifié. 2-3 phrases maximum. Va droit au but.
 Intègre les informations du ticket Jira (summary, description, acceptance criteria) si disponibles.
 
 ## Solution
 
-- Action concrète à realiser
+- Action concrète à réaliser
 - Autre action concrète
 - ...
 
-Chaque point est une étape actionnable. Tu peux mentionner des noms de fichiers si cela aide à la compréhension mais reste concis. Pas de code, pas de détail d'implementation.
+Chaque point est une étape actionnable. Tu peux mentionner des noms de fichiers si cela aide à la compréhension mais reste concis. Pas de code, pas de détail d'implémentation.
 
 ## Caveat
 
@@ -60,12 +60,12 @@ Chaque point est une étape actionnable. Tu peux mentionner des noms de fichiers
 - ...
 ```
 
-## Regles
+## Règles
 
 - Sois bref et concis : ce document est lu par un humain
 - Utilise un langage direct et orienté action
 - Priorise le contexte Jira (description, critères d'acceptation) sur le diff pour comprendre l'intention du ticket
 - La section Solution est une liste à puces, pas des paragraphes
-- La section Caveat peut être vide si aucun effet de bord n'est identifié (dans ce cas, écris "Aucun caveat identifié.")
+- La section Caveat peut être vide si aucun effet de bord n'est identifié (dans ce cas, écris « Aucun caveat identifié. »)
 - N'inclus pas les changements de configuration Claude (`.claude/`)
 - Tout le contenu doit être en français

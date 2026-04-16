@@ -63,8 +63,8 @@ Fields used in this repo (from [source code analysis](https://buildingbetter.tec
 | File | Trigger | Description |
 |------|---------|-------------|
 | [commands/commit.md](./commands/commit.md) | `/commit` | Conventional Commits 1.0.0 compliant commit — stages files and commits |
-| [commands/list-tasks-frontend.md](./commands/list-tasks-frontend.md) | `/list-tasks-frontend` | Generates French summary of frontend work (Fonctionnalites / Correctifs / Optimisations) |
-| [commands/plan-realisation-fe.md](./commands/plan-realisation-fe.md) | `/plan-realisation-fe` | Generates French plan document (Problematique / Solution / Caveat) — fetches Jira ticket context via `acli` |
+| [commands/list-tasks-frontend.md](./commands/list-tasks-frontend.md) | `/list-tasks-frontend` | Generates French summary of frontend work (Fonctionnalités / Correctifs / Optimisations) |
+| [commands/plan-realisation-fe.md](./commands/plan-realisation-fe.md) | `/plan-realisation-fe` | Generates French plan document (Problématique / Solution / Caveat) — fetches Jira ticket context via `acli` |
 | [commands/sync-claude-setup.md](./commands/sync-claude-setup.md) | `/sync-claude-setup` | Syncs all skills and commands from `D:/claude-code-setup` to `~/.claude/` |
 | [.claude/commands/cypress-test.md](./.claude/commands/cypress-test.md) | `/cypress-test` | Adds meaningful Cypress E2E tests for modified files (project-scoped) |
 
@@ -82,7 +82,7 @@ Fields used in this repo (from [source code analysis](https://buildingbetter.tec
 | [skills/acli-workitem/](./skills/acli-workitem/SKILL.md) | `/acli-workitem` | haiku | Creates, views, edits, transitions, assigns, and comments on Jira issues |
 | [skills/create-merge-request/](./skills/create-merge-request/SKILL.md) | `/create-merge-request` | inherit | Creates a GitLab MR using `glab` CLI with the Familiprix French template |
 | [skills/humanizer/](./skills/humanizer/SKILL.md) | `/humanizer` | inherit | Removes AI writing patterns from text — fixes inflated language, em dashes, sycophancy, filler, and adds human voice |
-| [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | inherit | French plan document — Problematique / Solution / Caveat; auto-fetches Jira ticket context via `acli-workitem` |
+| [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | inherit | French plan document — Problématique / Solution / Caveat; auto-fetches Jira ticket context via `acli-workitem` |
 | [skills/react-doctor/](./skills/react-doctor/SKILL.md) | `/react-doctor` | haiku | Runs `npx react-doctor` to scan React code and output a quality score |
 | [skills/update-merge-request/](./skills/update-merge-request/SKILL.md) | `/update-merge-request` | inherit | Syncs the "Travail effectué" section of the current branch's MR with its actual commits — only touches that section |
 
