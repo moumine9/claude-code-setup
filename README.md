@@ -15,10 +15,13 @@ claude-code-setup/
 ├── commands/                   → User-level slash commands → ~/.claude/commands/
 ├── config/
 │   └── settings-template.json  → Template for ~/.claude/settings.json
-├── hooks/                      → Hook scripts → ~/.claude/hooks/
+├── hooks/                      → Hook scripts (auto-synced to ~/.claude by auto-sync.sh)
 ├── skills/                     → Installable skills → ~/.claude/skills/<name>/SKILL.md
+├── sync.sh                     → Syncs all skills and commands to ~/.claude/
 └── README.md
 ```
+
+> **Sync system:** `sync.sh` copies every skill directory and command file from this repo into `~/.claude/`. It is triggered automatically via a `PostToolUse` hook on `Write|Edit` whenever any file under `skills/`, `commands/`, or `hooks/` is saved. Run `/sync-claude-setup` manually for a full resync. Uses real symlinks if Windows Developer Mode is enabled, otherwise copies.
 
 ---
 
@@ -61,7 +64,8 @@ Fields used in this repo (from [source code analysis](https://buildingbetter.tec
 |------|---------|-------------|
 | [commands/commit.md](./commands/commit.md) | `/commit` | Conventional Commits 1.0.0 compliant commit — stages files and commits |
 | [commands/list-tasks-frontend.md](./commands/list-tasks-frontend.md) | `/list-tasks-frontend` | Generates French summary of frontend work (Fonctionnalites / Correctifs / Optimisations) |
-| [commands/plan-realisation-fe.md](./commands/plan-realisation-fe.md) | `/plan-realisation-fe` | Generates French plan document (Problematique / Solution / Caveat) |
+| [commands/plan-realisation-fe.md](./commands/plan-realisation-fe.md) | `/plan-realisation-fe` | Generates French plan document (Problematique / Solution / Caveat) — fetches Jira ticket context via `acli` |
+| [commands/sync-claude-setup.md](./commands/sync-claude-setup.md) | `/sync-claude-setup` | Syncs all skills and commands from `D:/claude-code-setup` to `~/.claude/` |
 | [.claude/commands/cypress-test.md](./.claude/commands/cypress-test.md) | `/cypress-test` | Adds meaningful Cypress E2E tests for modified files (project-scoped) |
 
 ---
@@ -72,11 +76,15 @@ Fields used in this repo (from [source code analysis](https://buildingbetter.tec
 
 | Folder | Trigger | Model | Description |
 |--------|---------|-------|-------------|
+| [skills/acli-auth/](./skills/acli-auth/SKILL.md) | `/acli-auth` | haiku | Manages Atlassian CLI authentication — login, logout, status, switch accounts |
+| [skills/acli-search/](./skills/acli-search/SKILL.md) | `/acli-search` | haiku | Searches Jira work items by JQL; lists projects, boards, filters, dashboards |
+| [skills/acli-sprint/](./skills/acli-sprint/SKILL.md) | `/acli-sprint` | haiku | Lists, creates, and updates sprints; shows work items in a sprint |
+| [skills/acli-workitem/](./skills/acli-workitem/SKILL.md) | `/acli-workitem` | haiku | Creates, views, edits, transitions, assigns, and comments on Jira issues |
 | [skills/create-merge-request/](./skills/create-merge-request/SKILL.md) | `/create-merge-request` | inherit | Creates a GitLab MR using `glab` CLI with the Familiprix French template |
-| [skills/update-merge-request/](./skills/update-merge-request/SKILL.md) | `/update-merge-request` | inherit | Syncs the "Travail effectué" section of the current branch's MR with its actual commits — only touches that section |
 | [skills/humanizer/](./skills/humanizer/SKILL.md) | `/humanizer` | inherit | Removes AI writing patterns from text — fixes inflated language, em dashes, sycophancy, filler, and adds human voice |
-| [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | inherit | French plan document — Problematique / Solution / Caveat (skill version) |
+| [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | inherit | French plan document — Problematique / Solution / Caveat; auto-fetches Jira ticket context via `acli-workitem` |
 | [skills/react-doctor/](./skills/react-doctor/SKILL.md) | `/react-doctor` | haiku | Runs `npx react-doctor` to scan React code and output a quality score |
+| [skills/update-merge-request/](./skills/update-merge-request/SKILL.md) | `/update-merge-request` | inherit | Syncs the "Travail effectué" section of the current branch's MR with its actual commits — only touches that section |
 
 ### Skill frontmatter reference
 
@@ -169,6 +177,21 @@ Undocumented hook fields:
 | `once: true` | Fire exactly once, then auto-remove |
 | `async: true` | Run in background without blocking |
 | `asyncRewake: true` | Non-blocking normally, blocks if exit code 2 |
+
+### auto-sync.sh
+
+**Trigger:** `PostToolUse` on `Write | Edit`
+
+**What it does:**
+- Reads the tool input JSON from stdin and extracts `file_path`
+- Normalizes Windows-style paths (`D:\...` → `/d/...`)
+- Fires only when the edited file is under `D:/claude-code-setup/skills/`, `commands/`, or `hooks/`
+- Runs `sync.sh` to push the change to `~/.claude/` immediately
+- Returns the sync output as `additionalContext` so Claude sees what was synced
+
+**Registered in:** `~/.claude/settings.json` → `hooks.PostToolUse`
+
+---
 
 ### session-context.sh (NEW)
 
@@ -347,21 +370,35 @@ For projects using `glab` (GitLab), add these permissions:
 - [ ] [Claude Code CLI](https://claude.ai/code) installed
 - [ ] [Node.js LTS](https://nodejs.org/) installed (required for claude-hud statusline)
 - [ ] [`glab` CLI](https://gitlab.com/gitlab-org/cli) installed (required for `/create-merge-request`)
+- [ ] [`acli` CLI](https://developer.atlassian.com/cloud/acli/) installed (required for acli-* skills and `/plan-realisation-fe`)
 - [ ] [Figma desktop](https://www.figma.com/downloads/) installed (auto-configures figma-desktop MCP when open)
 
 ### Files to copy
-- [ ] Copy `agents/` → `~/.claude/agents/`
-- [ ] Copy `commands/` → `~/.claude/commands/`
-- [ ] Copy `skills/*/SKILL.md` → `~/.claude/skills/*/SKILL.md`
-- [ ] Copy `hooks/*.sh` → `~/.claude/hooks/` (or set up forwarders)
-- [ ] Merge `config/settings-template.json` into `~/.claude/settings.json`
+
+**Skills, commands, and hooks — run the sync script:**
+
+```bash
+# Bootstrap: copy sync-claude-setup command manually (one-time only)
+cp /d/claude-code-setup/commands/sync-claude-setup.md ~/.claude/commands/sync-claude-setup.md
+
+# Then run the full sync
+bash /d/claude-code-setup/sync.sh
+```
+
+After that, `/sync-claude-setup` keeps everything in sync. On subsequent runs just use the command.
+
+**Remaining manual steps:**
+- [ ] Merge `config/settings-template.json` into `~/.claude/settings.json` (hooks, permissions, plugins)
+- [ ] Copy `agents/` → `~/.claude/agents/` (agents are not managed by sync.sh)
 
 ### Manual setup
+- [ ] Authenticate acli: `acli jira auth login --web`
 - [ ] Install claude-hud plugin and run `/claude-hud:setup`
 - [ ] Set `alwaysThinkingEnabled: true` and `effortLevel: "high"` in `~/.claude/settings.json`
 - [ ] Add chrome-devtools MCP: `claude mcp add chrome-devtools -s user -- npx chrome-devtools-mcp@latest`
 - [ ] Add remote MCP servers (Gmail, Google Calendar) and authenticate via `/mcp`
 - [ ] Add project-level `settings.local.json` for any projects using `glab`
+- [ ] Enable Windows Developer Mode for real symlinks (optional — sync.sh falls back to copies)
 
 ---
 
