@@ -22,7 +22,7 @@ Tu dois analyser le contexte actuel (branche, commits, diff, code) **ainsi que l
 Exécute la commande suivante pour obtenir les détails du ticket :
 
 ```bash
-acli jira workitem view <KEY> --fields "key,issuetype,summary,status,assignee,description,acceptance-criteria,labels,priority"
+acli jira workitem view <KEY> --fields "summary,description,acceptance-criteria"
 ```
 
 Si la commande échoue ou que le ticket n'existe pas, continue sans le contexte Jira (note-le dans le document final).
