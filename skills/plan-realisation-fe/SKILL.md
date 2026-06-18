@@ -2,7 +2,6 @@
 name: plan-realisation-fe
 description: Analyse le probleme courant et genere un plan de realisation en 3 sections (Problematique, Solution, Caveat) en français
 user-invocable: true
-disable-model-invocation: true
 ---
 
 ## Ta tâche

@@ -78,8 +78,8 @@ _Notes additionnelles:_
 
 ### 5. Generate MR title
 
-- Format: `<TICKET-ID> - <short imperative description>`
-- Example: `PV2-15523 - Aligner la barre d'outils avec le DataGrid`
+- Format: `<TICKET-ID>: <short imperative description>`
+- Example: `PV2-15523: Aligner la barre d'outils avec le DataGrid`
 - Keep under 72 characters.
 - Short imperative description should be in French.
 
