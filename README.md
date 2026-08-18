@@ -248,28 +248,38 @@ so it was left alone.
 ## MCP Servers
 
 > Model Context Protocol servers extend Claude Code with external tool access.
-> Configured via `claude mcp add` — stored in `~/.claude/settings.json` under `mcpServers`.
+> Added with `claude mcp add` and stored in `~/.claude.json` — **not** in `settings.json`, which is why
+> `config/settings-template.json` does not carry them and they need re-adding by hand on a new machine.
 
-| Name | Scope | Type | Command / URL | Notes |
-|------|-------|------|--------------|-------|
-| chrome-devtools | User (all projects) | stdio | `npx chrome-devtools-mcp@latest` | Browser automation — navigate, screenshot, evaluate JS, intercept network |
-| figma-desktop | Local (per project) | http | `http://127.0.0.1:3845/mcp` | Auto-configured by Figma desktop app when running — no manual setup needed |
-| claude.ai Gmail | Remote | — | `https://gmail.mcp.claude.com/mcp` | Requires re-authentication after install |
-| claude.ai Google Calendar | Remote | — | `https://gcal.mcp.claude.com/mcp` | Requires re-authentication after install |
+### User scope (all projects)
 
-**To reinstall chrome-devtools on a new machine:**
+| Name | Type | Command | Purpose |
+|------|------|---------|---------|
+| `chrome-devtools` | stdio | `npx chrome-devtools-mcp@latest` | Browser automation — navigate, screenshot, evaluate JS, inspect network |
+| `figma` | stdio | `npx -y figma-developer-mcp` | Figma file access via the developer API |
+| `latoile` | stdio | `node D:/latoile/dist/src/mcp/server.js` | Local project-context graph — issues, MRs, activity |
+| `priorx-launchpad` | stdio | `node D:/repos/tools/launchpad/mcp/server.mjs` | Local service control — start/stop/restart, logs, notifications |
+
+Both local servers run from a built artifact, so their projects must be cloned and built before the server
+will start.
+
 ```bash
 claude mcp add chrome-devtools -s user -- npx chrome-devtools-mcp@latest
+claude mcp add figma -s user -- npx -y figma-developer-mcp
+claude mcp add latoile -s user -- node D:/latoile/dist/src/mcp/server.js
+claude mcp add priorx-launchpad -s user -- node D:/repos/tools/launchpad/mcp/server.mjs
 ```
 
-**Figma desktop MCP** is added automatically when you open Figma desktop — nothing to do manually.
+### Project scope
 
-**Remote MCP servers** (Gmail, Google Calendar) are added via the Claude Code settings UI or:
-```bash
-claude mcp add-json "claude.ai Gmail" '{"type":"remote","url":"https://gmail.mcp.claude.com/mcp"}' -s user
-claude mcp add-json "claude.ai Google Calendar" '{"type":"remote","url":"https://gcal.mcp.claude.com/mcp"}' -s user
-```
-Then re-authenticate via `/mcp` in a Claude Code session.
+| Name | Type | Endpoint | Notes |
+|------|------|----------|-------|
+| `figma-desktop` / `figma-local` | http | `http://127.0.0.1:3845/mcp` | Added automatically by the Figma desktop app while it is running — nothing to configure |
+| `GitLab` | http | `https://gitlab.com/api/v4/mcp` | Authenticate through `/mcp` |
+
+> **Credential note:** one project-scoped `figma` entry passes `--figma-api-key=` inline on the command.
+> That key lives only in `~/.claude.json` and is deliberately not mirrored into this repo — keep it that way,
+> and prefer an environment variable over an inline flag if you re-add it.
 
 ---
 
@@ -542,8 +552,7 @@ mkdir -p ~/.claude/hooks && cp /d/claude-code-setup/hooks/*.sh ~/.claude/hooks/
 - [ ] Run `/claude-hud:setup` to generate the `statusLine` value for this machine
 - [ ] Install the `acli-skills` plugin for Jira (it replaced the local `acli-*` skills)
 - [ ] Set `alwaysThinkingEnabled: true` and `effortLevel: "medium"` in `~/.claude/settings.json`
-- [ ] Add chrome-devtools MCP: `claude mcp add chrome-devtools -s user -- npx chrome-devtools-mcp@latest`
-- [ ] Add remote MCP servers (Gmail, Google Calendar) and authenticate via `/mcp`
+- [ ] Re-add the user-scope MCP servers (see [MCP Servers](#mcp-servers)) — they live in `~/.claude.json`, not in the settings template
 - [ ] Add project-level `settings.local.json` for any projects using `glab`
 - [ ] Enable Windows Developer Mode for real symlinks (optional — sync.sh falls back to copies)
 
