@@ -6,13 +6,15 @@ description: Create a Conventional Commits compliant git commit
 ## Context
 
 - Current git status: !`git status`
-- Current git diff (staged and unstaged changes): !`git diff HEAD`
+- Current git diff (staged and unstaged changes): !`git diff HEAD 2>/dev/null || echo "(no commits yet — everything below is untracked/new; see git status above)"`
 - Current branch: !`git branch --show-current`
-- Recent commits: !`git log --oneline -10`
+- Recent commits: !`git log --oneline -10 2>/dev/null || echo "(no commits yet)"`
 
 ## Your task
 
 Generate a commit message following the Conventional Commits 1.0.0 specification for the staged changes in this repository. Then stage all modified files and create the commit.
+
+If "Recent commits" above shows "(no commits yet)", this is the repository's first commit: there is no HEAD to diff against, so base the commit message on `git status` and the actual file contents instead of a diff. This is normal for a brand-new repo — proceed with staging and committing as usual (typically `feat: ...` or `chore: initial commit ...` depending on what's being added).
 
 STRUCTURE:
 <type>[optional scope]: <description>
