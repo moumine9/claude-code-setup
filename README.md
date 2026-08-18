@@ -286,7 +286,11 @@ claude mcp add priorx-launchpad -s user -- node D:/repos/tools/launchpad/mcp/ser
 ## Hooks
 
 Hooks live in `D:/claude-code-setup/hooks/` and are wired into `~/.claude/settings.json`.
-`~/.claude/hooks/` scripts are thin forwarders that call the D:/ source files so updates are automatic.
+
+On this machine `~/.claude/hooks/` holds thin forwarders that `exec` the D:/ source files, so editing a hook
+here takes effect immediately with no reinstall. Only the two currently-enabled hooks are installed that way
+(`protect-sensitive-files.sh`, `auto-update-mr-on-commit.sh`); `auto-sync.sh` is wired straight to its repo
+path and needs no forwarder at all.
 
 ### Hook system reference
 
@@ -315,6 +319,9 @@ Undocumented hook fields:
 - Reads the tool input JSON from stdin and extracts `file_path`
 - Normalizes Windows-style paths (`D:\...` → `/d/...`)
 - Fires only when the edited file is under `D:/claude-code-setup/skills/`, `commands/`, or `hooks/`
+- Note that an edit under `hooks/` triggers a sync but `sync.sh` does not copy `hooks/` — this is harmless
+  where the live wiring points at the repo path directly (as the auto-sync entry does), but a hook installed
+  as a standalone copy needs reinstalling by hand after an edit
 - Runs `sync.sh` to push the change to `~/.claude/` immediately
 - Returns the sync output as `additionalContext` so Claude sees what was synced
 
@@ -322,7 +329,11 @@ Undocumented hook fields:
 
 ---
 
-### session-context.sh (NEW)
+### session-context.sh — available, not currently enabled
+
+> Present in `hooks/` and in `config/settings-template.json`, but **not** wired into the live
+> `~/.claude/settings.json` and not installed in `~/.claude/hooks/`. Enable it by adding the `SessionStart`
+> entry from the template and installing the script.
 
 **Trigger:** `SessionStart`
 
@@ -350,7 +361,10 @@ Undocumented hook fields:
 { "permissions": { "allow": ["Read(./.env.local)"] } }
 ```
 
-### dry-run-guard.sh (NEW)
+### dry-run-guard.sh — available, not currently enabled
+
+> Same status as `session-context.sh`: shipped in `hooks/` and referenced by the settings template, but not
+> active in the live configuration.
 
 **Trigger:** `PreToolUse` on `Bash`
 
@@ -528,13 +542,11 @@ After that, `/sync-claude-setup` keeps everything in sync. On subsequent runs ju
 
 - [ ] Merge `config/settings-template.json` into `~/.claude/settings.json` (hooks, permissions, plugins)
 - [ ] Copy `agents/` → `~/.claude/agents/` (agents are not managed by sync.sh)
-- [ ] Copy `hooks/` → `~/.claude/hooks/` (also not managed by sync.sh):
-```bash
-mkdir -p ~/.claude/hooks && cp /d/claude-code-setup/hooks/*.sh ~/.claude/hooks/
-```
-  The `settings.json` hook entries reference `${CLAUDE_CONFIG_DIR}/hooks/...` and fail silently if the
-  scripts are missing. The one exception is the `Write|Edit` auto-sync entry, which points straight at
-  `/d/claude-code-setup/hooks/auto-sync.sh` so it always runs the current version from the repo.
+- [ ] Install the hooks into `~/.claude/hooks/` (not managed by sync.sh) — see
+  [Setup on a new machine](#setup-on-a-new-machine) for the forwarder and standalone-copy options.
+  The `settings.json` entries reference `${CLAUDE_CONFIG_DIR}/hooks/...` and fail silently if the script
+  is missing. The `Write|Edit` auto-sync entry is the exception: it points straight at
+  `/d/claude-code-setup/hooks/auto-sync.sh`, so it always runs the current version from the repo.
 
 ### Manual setup
 - [ ] Authenticate acli: `acli jira auth login --web`
