@@ -72,7 +72,6 @@ Fields used in this repo (from [source code analysis](https://buildingbetter.tec
 
 | File | Trigger | Description |
 |------|---------|-------------|
-| [commands/commit.md](./commands/commit.md) | `/commit` | Conventional Commits 1.0.0 compliant commit — stages files and commits |
 | [commands/opus.md](./commands/opus.md) | `/opus [effort]` | Switches the model to Opus. Effort defaults to `medium` |
 | [commands/sonnet.md](./commands/sonnet.md) | `/sonnet [effort]` | Switches the model to Sonnet. Effort defaults to `medium` |
 | [commands/haiku.md](./commands/haiku.md) | `/haiku [effort]` | Switches the model to Haiku. Effort defaults to `medium` |
@@ -147,6 +146,7 @@ used plugin in this setup as a removal candidate.
 
 | Folder | Trigger | Model | Description |
 |--------|---------|-------|-------------|
+| [skills/commit/](./skills/commit/SKILL.md) | `/commit` or automatic | inherit | Conventional Commits 1.0.0 compliant commit — stages files and commits. Model-invocable: fires on "commit this" without the slash command |
 | [skills/create-merge-request/](./skills/create-merge-request/SKILL.md) | `/create-merge-request` | inherit | Creates a GitLab MR using `glab` CLI with the Familiprix French template |
 | [skills/humanizer/](./skills/humanizer/SKILL.md) | `/humanizer` | inherit | Removes AI writing patterns from text — fixes inflated language, em dashes, sycophancy, filler, and adds human voice |
 | [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | inherit | French plan document — Problématique / Solution / Caveat; auto-fetches Jira ticket context via the `acli-skills` plugin |
