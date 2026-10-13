@@ -1,5 +1,5 @@
 ---
-name: functional-review-video
+name: revue-fonctionnelle
 description: Record a real screen video of a frontend feature for the functional analyst ("revue fonctionnelle") — drives the locally running Priorx app through chrome-devtools, records the tab with getDisplayMedia + MediaRecorder, shows a drawn cursor, French step captions and highlights, fits the whole page in frame, and saves a seekable .webm. Use when asked to "record the functional review", "screen record the feature", "make a video for the analyst", "refais la vidéo de revue fonctionnelle", or to prove each acceptance criterion visually.
 ---
 

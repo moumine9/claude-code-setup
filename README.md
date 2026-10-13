@@ -148,9 +148,9 @@ used plugin in this setup as a removal candidate.
 |--------|---------|-------|-------------|
 | [skills/commit/](./skills/commit/SKILL.md) | `/commit [PV2-XXXXX]` or automatic | inherit | Conventional Commits 1.0.0 commit scoped to the Jira work item plus the code area — `feat(PV2-12493: panier): …`, ticket inferred from the branch name, asks when it cannot find one. Model-invocable: fires on "commit this" without the slash command |
 | [skills/create-merge-request/](./skills/create-merge-request/SKILL.md) | `/create-merge-request` | inherit | Creates a GitLab MR using `glab` CLI with the Familiprix French template |
-| [skills/functional-review-video/](./skills/functional-review-video/SKILL.md) | `/functional-review-video` or automatic | inherit | Records a real tab video of a feature for the analyst (revue fonctionnelle) via chrome-devtools + `getDisplayMedia` — drawn cursor, French captions, whole page in frame through CSS zoom, seekable `.webm` saved under `D:\tmp\<TICKET>\`. Ships `scripts/` (page helpers, b64 decode, WebM duration fix) |
 | [skills/humanizer/](./skills/humanizer/SKILL.md) | `/humanizer` | inherit | Removes AI writing patterns from text — fixes inflated language, em dashes, sycophancy, filler, and adds human voice |
 | [skills/plan-realisation-fe/](./skills/plan-realisation-fe/SKILL.md) | `/plan-realisation-fe` | inherit | French plan document — Problématique / Solution / Caveat; auto-fetches Jira ticket context via the `acli-skills` plugin |
+| [skills/revue-fonctionnelle/](./skills/revue-fonctionnelle/SKILL.md) | `/revue-fonctionnelle` or automatic | inherit | Records a real tab video of a feature for the analyst (revue fonctionnelle) via chrome-devtools + `getDisplayMedia` — drawn cursor, French captions, whole page in frame through CSS zoom, seekable `.webm` saved under `D:\tmp\<TICKET>\`. Ships `scripts/` (page helpers, b64 decode, WebM duration fix) |
 | [skills/update-merge-request/](./skills/update-merge-request/SKILL.md) | `/update-merge-request` | inherit | Syncs the "Travail effectué" section of the current branch's MR with its actual commits — only touches that section |
 
 ### Skill frontmatter reference
